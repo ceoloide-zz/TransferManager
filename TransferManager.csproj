@@ -68,16 +68,17 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractTransfer.cs" />
-    <Compile Include="DownloadTransfer.cs" />
-    <Compile Include="TransferDataContext.cs" />
-    <Compile Include="TransferSettings.cs" />
-    <Compile Include="ExtendedTransferStatus.cs" />
-    <Compile Include="ITransferable.cs" />
-    <Compile Include="TransferManagerContext.cs" />
+    <Compile Include="Model\AbstractTransfer.cs" />
+    <Compile Include="Model\DownloadTransfer.cs" />
+    <Compile Include="Model\TransferDataContext.cs" />
+    <Compile Include="Model\UploadTransfer.cs" />
+    <Compile Include="Settings\TransferSettings.cs" />
+    <Compile Include="Model\ExtendedTransferStatus.cs" />
+    <Compile Include="Model\ITransferable.cs" />
+    <Compile Include="Manager\TransferManagerContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TransferManager.cs" />
-    <Compile Include="TransferViewModel.cs" />
+    <Compile Include="Manager\TransferManager.cs" />
+    <Compile Include="ViewModel\TransferViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

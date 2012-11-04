@@ -9,42 +9,16 @@ using System.Windows;
 
 namespace TransferManager
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    [Table]
-    public partial class DownloadTransfer : AbstractTransfer
+
+    public class UploadTransfer : AbstractTransfer
     {
-        // Version column aids update performance.
-        [Column(IsVersion = true)]
-        private Binary _version;
-
-        private int _UID;
-        /// <summary>
-        /// Gets or sets the unique ID of the transfer.
-        /// </summary>
-        [Column(IsPrimaryKey = true, IsDbGenerated = true, DbType = "INT NOT NULL Identity", CanBeNull = false, AutoSync = AutoSync.OnInsert)]
-        public int UID
-        {
-            get { return _UID; }
-            set
-            {
-                if (_UID != value)
-                {
-                    NotifyPropertyChanging("UID");
-                    _UID = value;
-                    NotifyPropertyChanged("UID");
-                }
-            }
-        }
-
         /// <summary>
         /// Parameterless constructor.
         /// </summary>
-        public DownloadTransfer()
+        public UploadTransfer()
             : base()
         {
-            _Method = "GET";
+            _Method = "POST";
             //_Headers = new KeyValuePair<string, string>();
             _TransferStatus = ExtendedTransferStatus.None;
             _IsIndeterminateTransfer = true;
@@ -57,7 +31,7 @@ namespace TransferManager
         /// Checks whether the destination folder of the download exists. If it doesn't
         /// exists, this method creates it.
         /// </summary>
-        public void OnBeforeAdd()
+        public override void OnBeforeAdd()
         {
             using (IsolatedStorageFile IsoStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
@@ -69,7 +43,7 @@ namespace TransferManager
         /// <summary>
         /// This method is called when a transfer has been completed successfully.
         /// </summary>
-        public void OnComplete()
+        public override void OnComplete()
         {
             // We need to move the file to its intended location.
             // To avoid blocking the UI, we let a BackgroundWorker do the job and asynchronously
@@ -88,7 +62,7 @@ namespace TransferManager
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Worker_DoWork(object sender, DoWorkEventArgs e)
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             // TODO: What happens if the user closes the application while the BackgroundWorker is still pending?
             // Should it be handled?
@@ -132,7 +106,7 @@ namespace TransferManager
         /// </summary>
         /// <param name="sender">The sender object.</param>
         /// <param name="e">The arguments passed to this method.</param>
-        void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if ((ExtendedTransferStatus)e.Result == ExtendedTransferStatus.Completed)
             {
@@ -142,7 +116,7 @@ namespace TransferManager
             }
             TransferStatus = (ExtendedTransferStatus)e.Result;
         }
-    
+
         /// <summary>
         /// Provides an handler for changes of transfer progress. Mainly used to update UI.
         /// Event argument contains BytesReceived / BytesSent that represent current transfer status
@@ -152,7 +126,7 @@ namespace TransferManager
         /// </summary>
         /// <param name="sender">The sender object.</param>
         /// <param name="e">The event args.</param>
-        void ITransferable.TransferProgressChanged(object sender, BackgroundTransferEventArgs e)
+        public override void TransferProgressChanged(object sender, BackgroundTransferEventArgs e)
         {
             // If TotalBytesToReceive == -1 the transfer is indeterminate
             IsIndeterminateTransfer = (e.Request.TotalBytesToReceive == -1 && TransferStatus == ExtendedTransferStatus.Transferring);

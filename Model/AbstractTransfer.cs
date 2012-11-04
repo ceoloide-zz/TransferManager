@@ -9,9 +9,18 @@ using System.Windows;
 
 namespace TransferManager
 {
-
+    [Table]
+    [InheritanceMapping(Code = "DT", Type = typeof(DownloadTransfer), IsDefault = true)]
+    [InheritanceMapping(Code = "UT", Type = typeof(UploadTransfer))]
     public abstract class AbstractTransfer : INotifyPropertyChanged, INotifyPropertyChanging, ITransferable
     {
+        // Version column aids update performance.
+        [Column(IsVersion = true)]
+        private Binary _version;
+
+        // Discriminator column allows inheritance mapping.
+        [Column(IsDiscriminator = true)]
+        private string _discriminator;
 
         #region INotifyPropertyChanged Members
 
@@ -46,12 +55,32 @@ namespace TransferManager
         /// <summary>
         /// Parameterless constructor.
         /// </summary>
-        public AbstractTransfer();
+        public AbstractTransfer() { }
+
+        protected int _UID;
+        /// <summary>
+        /// Gets or sets the unique ID of the transfer.
+        /// </summary>
+        [Column(IsPrimaryKey = true, IsDbGenerated = true, DbType = "INT NOT NULL Identity", CanBeNull = false, AutoSync = AutoSync.OnInsert)]
+        public virtual int UID
+        {
+            get { return _UID; }
+            set
+            {
+                if (_UID != value)
+                {
+                    NotifyPropertyChanging("UID");
+                    _UID = value;
+                    NotifyPropertyChanged("UID");
+                }
+            }
+        }
 
         protected string _Path;
         /// <summary>
         /// The path to the transferred resource (e.g. /local/download/).
         /// </summary>
+        [Column]
         public string Path
         {
             get { return _Path; }
@@ -86,6 +115,7 @@ namespace TransferManager
         /// <summary>
         /// Gets the filename of the transferred resource.
         /// </summary>
+        [Column]
         public string Filename
         {
             get { return _Filename; }
@@ -108,12 +138,13 @@ namespace TransferManager
         /// <summary>
         /// Operations to be performed before adding the transfer to the transfer manager
         /// </summary>
-        public void OnBeforeAdd();
+        public abstract void OnBeforeAdd();
 
         protected string _Method;
         /// <summary>
         /// Gets the transfer method (e.g. GET).
         /// </summary>
+        [Column]
         public string Method
         {
             get { return _Method; }
@@ -150,6 +181,7 @@ namespace TransferManager
         /// <summary>
         /// Gets or sets the url of the ITransferable object.
         /// </summary>
+        [Column]
         public string TransferUrl
         {
             get { return _TransferUrl; }
@@ -183,6 +215,7 @@ namespace TransferManager
         /// Holds the RequestId property of the BackgroundTransfer
         /// instance asssociated with this object.
         /// </summary>
+        [Column]
         public string RequestId
         {
             get { return _RequestId; }
@@ -199,6 +232,7 @@ namespace TransferManager
         /// Public property that holds the TransferStatus of the ITransferable object.
         /// The implementation should define the behaviour for each transfer status.
         /// </summary>
+        [Column]
         public ExtendedTransferStatus TransferStatus
         {
             get
@@ -232,13 +266,14 @@ namespace TransferManager
         /// <summary>
         /// This method is called when a transfer has been completed successfully.
         /// </summary>
-        public void OnComplete();
+        public abstract void OnComplete();
 
         protected bool _IsIndeterminateTransfer;
         /// <summary>
         /// Gets or sets whether the current transfer is indeterminate or not. A download
         /// transfer is indeterminate if TotalBytesToReceive is -1.
         /// </summary>
+        [Column]
         public bool IsIndeterminateTransfer
         {
             get { return _IsIndeterminateTransfer; }
@@ -254,6 +289,7 @@ namespace TransferManager
         /// <summary>
         /// Gets or sets the total bytes to receive for the current download transfer.
         /// </summary>
+        [Column]
         public long TotalBytesToTransfer
         {
             get { return _TotalBytesToTransfer; }
@@ -269,6 +305,7 @@ namespace TransferManager
         /// <summary>
         /// Gets or sets the bytes that have been currently received.
         /// </summary>
+        [Column]
         public long BytesTransferred
         {
             get { return _BytesTransferred; }
@@ -284,6 +321,7 @@ namespace TransferManager
         /// <summary>
         /// Gets or sets the transfer progress.
         /// </summary>
+        [Column]
         public double TransferProgress
         {
             get { return _TransferProgress; }
@@ -300,7 +338,7 @@ namespace TransferManager
         /// </summary>
         /// <param name="sender">The sender object.</param>
         /// <param name="e">The event args.</param>
-        void ITransferable.TransferProgressChanged(object sender, BackgroundTransferEventArgs e);
+        public abstract void TransferProgressChanged(object sender, BackgroundTransferEventArgs e);
 
         /// <summary>
         /// Provides a method that can be used to reset the transfer progress.

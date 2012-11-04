@@ -10,7 +10,8 @@ namespace TransferManager
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class TransferViewModel<T> : TransferManagerContext, INotifyPropertyChanging, INotifyPropertyChanged where T : class, ITransferable
+    public class TransferViewModel<T> : TransferManagerContext, INotifyPropertyChanging, INotifyPropertyChanged 
+        where T : class, ITransferable
     {
         #region INotifyPropertyChanged Members
 
@@ -233,6 +234,29 @@ namespace TransferManager
                 return (AllFoundTransfers.Count<ITransferable>() > 0) ? AllFoundTransfers.First<ITransferable>() : null;
             }
             catch(Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// This method provides a way to retrieve an ITransferable object based on
+        /// its UID property. This method returns NULL if no ITransferable object is found.
+        /// This method returns the first instance of ITransferable item that is found.
+        /// </summary>
+        /// <param name="Tag">An int that represents the UID property of the ITransferable object to retrieve</param>
+        /// <returns>An ITransferable object.</returns>
+        public ITransferable FindByUID(int UID)
+        {
+            try
+            {
+                var AllFoundTransfers = from ITransferable Item in _DataContext.Transfers
+                                        where Item.UID == UID
+                                        select Item;
+
+                return (AllFoundTransfers.Count<ITransferable>() > 0) ? AllFoundTransfers.First<ITransferable>() : null;
+            }
+            catch (Exception)
             {
                 return null;
             }
