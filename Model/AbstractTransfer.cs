@@ -227,6 +227,23 @@ namespace TransferManager
             }
         }
 
+        protected string _ExternalReference;
+        /// <summary>
+        /// Holds the reference to an external object that this transfer
+        /// is associated to.
+        /// </summary>
+        [Column(CanBeNull = true)]
+        public string ExternalReference
+        {
+            get { return _ExternalReference; }
+            set
+            {
+                NotifyPropertyChanging("ExternalReference");
+                _ExternalReference = value;
+                NotifyPropertyChanged("ExternalReference");
+            }
+        }
+
         protected ExtendedTransferStatus _TransferStatus;
         /// <summary>
         /// Public property that holds the TransferStatus of the ITransferable object.

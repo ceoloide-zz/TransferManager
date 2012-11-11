@@ -66,6 +66,12 @@ namespace TransferManager
         string RequestId { get; set; }
 
         /// <summary>
+        /// Public property that holds the reference to an external object that this
+        /// transfer is associated to.
+        /// </summary>
+        string ExternalReference { get; set; }
+
+        /// <summary>
         /// Public property that holds the TransferStatus of the ITransferable object.
         /// The implementation should define the behaviour for each transfer status.
         /// </summary>
